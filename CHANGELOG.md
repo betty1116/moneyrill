@@ -1,8 +1,22 @@
 # Changelog
 
-All notable changes. The format follows [Keep a Changelog](https://keepachangelog.com); versions are tags (`v0.1.0`) and each tag publishes a container image.
+All notable changes. The format follows [Keep a Changelog](https://keepachangelog.com); versions are tags (`v0.0.2`) and each tag publishes a container image.
 
 ## [Unreleased]
+
+## [0.0.2] - 2026-11-01
+
+### Added
+
+- **The published image also runs on arm64** (Apple Silicon, Raspberry Pi and other ARM machines): each release now builds for amd64 and arm64. Before, `docker compose up` stopped on an ARM machine with `no matching manifest`.
+
+### Fixed
+
+- **The image instructions name a version that exists**: the docs and example files asked for `0.1.0`, which was never published here. They now use `0.0.2`.
+
+## [0.0.1] - 2026-11-01
+
+First public release, covering everything built so far:
 
 ### Added
 
@@ -15,43 +29,8 @@ All notable changes. The format follows [Keep a Changelog](https://keepachangelo
 
 - **Reach the app from your phone or laptop with Tailscale**: set `TAILSCALE_HOST` to this computer's MagicDNS name and run `tailscale serve`, and the app answers on `https://<name>.ts.net` inside your private tailnet. It still listens only on localhost; the passphrase and data travel over HTTPS. See `docs/development/OPERATIONS.md`.
 
-### Changed
-
-- **`TRUST_PROXY` now reaches the app**: before, setting it in `.env` or `.env.production` had no effect because the Compose files did not pass it on → now they do (default off).
-
-- **Transactions page default list**: before, transactions you added to a manual investment account (a 401(k), equity awards) were listed by default → now they are listed with **Show investment accounts** on. They count in Reports exactly as before. The day totals and the page sentence no longer include them.
-
-- **Rules** (Settings → Rules): "if a transaction looks like this, give it that category". Conditions on merchant name, original statement, amount, category and account; they run top to bottom (drag to reorder) and the last match wins. The editor previews exactly which transactions would change, and **Update existing transactions** applies that preview in bulk. Rules also run on every sync. Your own category choice always wins over a rule, and a rule never touches split transactions or ones you added. Migration `014_rules.sql` is additive.
-
-### Fixed
-
-- **Sign-in could be skipped with a percent-encoded path**: the sign-in and host checks looked at the path as written, but the router decodes it, so a request like `/%61pi/overview` reached the data without a session. The checks now use the route the request is routed to. Upgrade, especially with `ALLOW_LAN`.
-- **Docs for the published image**: on Linux and a NAS the key file must be owned by user 1000 (`sudo chown 1000:1000 production.key`), otherwise every connection shows `SYNC_FAILED` with "Cannot read the token key"; the examples and OPERATIONS now say so. The restore steps say to wait for the first-start database setup to finish, and the download commands use `curl -fsSLO` so a 404 fails instead of saving an error page.
-
-## [0.1.0] - 2026-10-15
-
-### Added
-
 - **Configurable ports**: `STAGING_PORT` (default 3002) and `PRODUCTION_PORT` (default 3003) set the port each environment is published on, in `.env` or, to override it, `.env.production`. The compose files, `deploy.sh`, `ship.sh` (smoke tests) and `rollback.sh` follow them, `PUBLIC_ORIGIN` matches, and `deploy.sh` refuses the same port for both. Defaults are unchanged.
 - **An example for the published image**: `examples/compose.image.yaml` runs the app, worker and PostgreSQL from `ghcr.io/betty1116/moneyrill` without cloning or building (demo setup), and `examples/compose.image.production.yaml` does the same for real accounts; documented in Running Moneyrill, with backup, restore and upgrade steps.
-
-### Changed
-
-- **Personal files are ignored by git**: `CLAUDE.local.md` and `private/` (the maintainer's own agent rules and notes) are in `.gitignore`. The export script and its exclude list, which made a public copy of a private repository, are removed.
-
-### Changed
-
-- **The README shows real screenshots** of the staging demo app (`docs/screenshots/`), taken by `scripts/screenshots.mjs`; the design mockups stay in `docs/design/zen/`.
-- **Production has no environment marks**: its top bar shows a round **Sync accounts** button instead of the badge, and the page has no colour strip. Staging keeps both.
-- **The Accounts page has an Add an account button** beside its heading (the same Plaid Link as Settings → Connections).
-- **Transactions can filter by a custom date range**: Custom range in When, with From and To calendar fields under the presets.
-- **Home links match where they go**: This month opens this month's Cash flow report (it opened the default range); the Spending card opens the Spending report; "Where it went" says Spending. Each recent transaction opens its details on Home. The Reports breadcrumb names the page it returns to.
-
-## [0.0.1] - 2026-10-07
-
-First public release, covering everything built so far:
-
-### Added
 
 - **A Zen logo**: the net-worth line as a small stream on a cream tile, with the serif wordmark. New favicons, app icons and README logo (light and dark), all rendered from `docs/design/logo/icon.svg`.
 
@@ -72,6 +51,20 @@ First public release, covering everything built so far:
 
 ### Changed
 
+- **`TRUST_PROXY` now reaches the app**: before, setting it in `.env` or `.env.production` had no effect because the Compose files did not pass it on → now they do (default off).
+
+- **Transactions page default list**: before, transactions you added to a manual investment account (a 401(k), equity awards) were listed by default → now they are listed with **Show investment accounts** on. They count in Reports exactly as before. The day totals and the page sentence no longer include them.
+
+- **Rules** (Settings → Rules): "if a transaction looks like this, give it that category". Conditions on merchant name, original statement, amount, category and account; they run top to bottom (drag to reorder) and the last match wins. The editor previews exactly which transactions would change, and **Update existing transactions** applies that preview in bulk. Rules also run on every sync. Your own category choice always wins over a rule, and a rule never touches split transactions or ones you added. Migration `014_rules.sql` is additive.
+
+- **Personal files are ignored by git**: `CLAUDE.local.md` and `private/` (the maintainer's own agent rules and notes) are in `.gitignore`. The export script and its exclude list, which made a public copy of a private repository, are removed.
+
+- **The README shows real screenshots** of the staging demo app (`docs/screenshots/`), taken by `scripts/screenshots.mjs`; the design mockups stay in `docs/design/zen/`.
+- **Production has no environment marks**: its top bar shows a round **Sync accounts** button instead of the badge, and the page has no colour strip. Staging keeps both.
+- **The Accounts page has an Add an account button** beside its heading (the same Plaid Link as Settings → Connections).
+- **Transactions can filter by a custom date range**: Custom range in When, with From and To calendar fields under the presets.
+- **Home links match where they go**: This month opens this month's Cash flow report (it opened the default range); the Spending card opens the Spending report; "Where it went" says Spending. Each recent transaction opens its details on Home. The Reports breadcrumb names the page it returns to.
+
 - `vercel.json` turns off Vercel's automatic deployments of this repository's branches; nothing is published from it until that is changed on purpose.
 - `INSTANCE_NAME` (default `moneyrill`) names the Docker projects, database volumes and database user, so a new installation is `moneyrill-*` and an existing one keeps its names by setting it; `deploy.sh` refuses to start an installation under a new name when another installation's database volume exists. The release image is now tagged `moneyrill-release`, and the public export no longer rewrites any file.
 - Ready to publish: personal agent rules and notes moved to a private overlay (`CLAUDE.local.md`, `private/`) that the export leaves out; the demo data uses only made-up names; CI scans every file and pull request for secrets (gitleaks).
@@ -80,5 +73,8 @@ First public release, covering everything built so far:
 - An unreadable, missing or malformed token key is reported in plain words at start-up and when a connection needs it.
 
 ### Fixed
+
+- **Sign-in could be skipped with a percent-encoded path**: the sign-in and host checks looked at the path as written, but the router decodes it, so a request like `/%61pi/overview` reached the data without a session. The checks now use the route the request is routed to. Upgrade, especially with `ALLOW_LAN`.
+- **Docs for the published image**: on Linux and a NAS the key file must be owned by user 1000 (`sudo chown 1000:1000 production.key`), otherwise every connection shows `SYNC_FAILED` with "Cannot read the token key"; the examples and OPERATIONS now say so. The restore steps say to wait for the first-start database setup to finish, and the download commands use `curl -fsSLO` so a 404 fails instead of saving an error page.
 
 - On a phone, a long transaction name (a Zelle line) widened the Transactions page so it scrolled sideways and the amount overlapped the name; long names now end in an ellipsis.

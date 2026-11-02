@@ -4,7 +4,7 @@
 #   mkdir moneyrill && cd moneyrill && curl -O <raw URL of this file>
 #   openssl rand -hex 32 > token.key && chmod 600 token.key
 #   Linux or NAS: also run  sudo chown 1000:1000 token.key  (the container runs as user 1000)
-#   MONEYRILL_VERSION=0.1.0 docker compose -f compose.image.yaml up -d
+#   MONEYRILL_VERSION=0.0.2 docker compose -f compose.image.yaml up -d
 #   open http://localhost:3002        (STAGING_PORT in the environment or a .env next to this file changes the port)
 #
 # This is the demo setup: simulated data and Plaid Sandbox. Keep token.key: it encrypts the bank tokens, and
@@ -26,7 +26,7 @@ services:
       retries: 20
   app:
     restart: unless-stopped
-    image: ghcr.io/betty1116/moneyrill:${MONEYRILL_VERSION:?Set MONEYRILL_VERSION to a released version, e.g. 0.1.0}
+    image: ghcr.io/betty1116/moneyrill:${MONEYRILL_VERSION:?Set MONEYRILL_VERSION to a released version, e.g. 0.0.2}
     ports: ['127.0.0.1:${STAGING_PORT:-3002}:3002'] # loopback only: do not publish this to the internet
     environment:
       DATABASE_URL: postgres://moneyrill:${POSTGRES_PASSWORD:-local-demo-only}@db:5432/moneyrill
@@ -52,7 +52,7 @@ services:
       retries: 10
   worker:
     restart: unless-stopped
-    image: ghcr.io/betty1116/moneyrill:${MONEYRILL_VERSION:?Set MONEYRILL_VERSION to a released version, e.g. 0.1.0}
+    image: ghcr.io/betty1116/moneyrill:${MONEYRILL_VERSION:?Set MONEYRILL_VERSION to a released version, e.g. 0.0.2}
     command: [npm, run, worker]
     environment:
       DATABASE_URL: postgres://moneyrill:${POSTGRES_PASSWORD:-local-demo-only}@db:5432/moneyrill

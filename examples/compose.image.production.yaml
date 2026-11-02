@@ -4,7 +4,7 @@
 #   openssl rand -hex 32 > production.key && chmod 600 production.key
 #   Linux or NAS: also run  sudo chown 1000:1000 production.key  (the container runs as user 1000)
 #   Create .env.production (see OPERATIONS.md) with PLAID_CLIENT_ID, PLAID_SECRET and POSTGRES_PASSWORD.
-#   MONEYRILL_VERSION=0.1.0 docker compose --env-file .env.production -f compose.image.production.yaml up -d
+#   MONEYRILL_VERSION=0.0.2 docker compose --env-file .env.production -f compose.image.production.yaml up -d
 #   open http://localhost:3003        (PRODUCTION_PORT in .env.production changes the port)
 #
 # Back up production.key and .env.production together with your database backups: the key encrypts the bank
@@ -28,7 +28,7 @@ services:
       retries: 20
   app:
     restart: unless-stopped
-    image: ghcr.io/betty1116/moneyrill:${MONEYRILL_VERSION:?Set MONEYRILL_VERSION to a released version, e.g. 0.1.0}
+    image: ghcr.io/betty1116/moneyrill:${MONEYRILL_VERSION:?Set MONEYRILL_VERSION to a released version, e.g. 0.0.2}
     ports: ['${BIND_ADDRESS:-127.0.0.1}:${PRODUCTION_PORT:-3003}:3002'] # loopback unless BIND_ADDRESS is set to a private LAN address; never 0.0.0.0
     env_file: .env.production
     environment:
@@ -56,7 +56,7 @@ services:
       retries: 10
   worker:
     restart: unless-stopped
-    image: ghcr.io/betty1116/moneyrill:${MONEYRILL_VERSION:?Set MONEYRILL_VERSION to a released version, e.g. 0.1.0}
+    image: ghcr.io/betty1116/moneyrill:${MONEYRILL_VERSION:?Set MONEYRILL_VERSION to a released version, e.g. 0.0.2}
     command: [npm, run, worker]
     env_file: .env.production
     environment:

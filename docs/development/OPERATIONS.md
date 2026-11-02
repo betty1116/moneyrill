@@ -39,14 +39,14 @@ Setup generates a separate database password and key without replacing existing 
 
 ## Run the published image
 
-Each release tag (`v0.1.0`) publishes an image to `ghcr.io/betty1116/moneyrill` (tags `0.1.0` and `0.1`). To try Moneyrill without cloning the source, use [`examples/compose.image.yaml`](../../examples/compose.image.yaml): it starts the app, the worker and PostgreSQL from that image with the demo setup (simulated data, Plaid Sandbox, loopback only).
+Each release tag (`v0.0.2`) publishes an image to `ghcr.io/betty1116/moneyrill` for amd64 and arm64 (tags `0.0.2`, `0.0` and `latest`). To try Moneyrill without cloning the source, use [`examples/compose.image.yaml`](../../examples/compose.image.yaml): it starts the app, the worker and PostgreSQL from that image with the demo setup (simulated data, Plaid Sandbox, loopback only).
 
 ```sh
 mkdir moneyrill && cd moneyrill
 curl -fsSLO https://raw.githubusercontent.com/betty1116/moneyrill/main/examples/compose.image.yaml
 openssl rand -hex 32 > token.key && chmod 600 token.key       # keep it: it encrypts the bank tokens
 # Linux or NAS: the container runs as user 1000, so also run: sudo chown 1000:1000 token.key
-MONEYRILL_VERSION=0.1.0 docker compose -f compose.image.yaml up -d
+MONEYRILL_VERSION=0.0.2 docker compose -f compose.image.yaml up -d
 open http://localhost:3002                                    # Linux: xdg-open
 ```
 
@@ -68,7 +68,7 @@ PLAID_CLIENT_ID=<your Production client id>
 PLAID_SECRET=<your Production secret>
 POSTGRES_PASSWORD=$(openssl rand -hex 24)
 ENV
-MONEYRILL_VERSION=0.1.0 docker compose --env-file .env.production -f compose.image.production.yaml up -d
+MONEYRILL_VERSION=0.0.2 docker compose --env-file .env.production -f compose.image.production.yaml up -d
 ```
 
 Then open http://localhost:3003 (or your `PRODUCTION_PORT` from `.env.production`) and **create the sign-in passphrase right away** (see [Sign-in](#sign-in-passphrase)): until one exists, whoever opens the page first can choose it.
@@ -98,7 +98,7 @@ Carry the dump and the files above over a private channel (`scp`, a USB drive), 
 **Restore** on the new computer, in a new folder holding the example compose file, `production.key` and `.env.production` (a **new** `POSTGRES_PASSWORD` is fine, `INSTANCE_NAME` can be anything; add `BIND_ADDRESS=<its private LAN address>` and `ALLOW_LAN=true` to reach it from other devices, never `0.0.0.0`):
 
 ```sh
-export MONEYRILL_VERSION=0.1.0       # at least the version that made the dump
+export MONEYRILL_VERSION=0.0.2       # at least the version that made the dump
 c="docker compose --env-file .env.production -f compose.image.production.yaml"
 $c up -d db                           # the app has not run, so the database is empty
 $c logs --tail 5 db                   # first start only: wait for "init process complete", then "ready to accept connections" (a slow disk takes longer)
@@ -112,17 +112,17 @@ Sign in with your old passphrase and compare accounts and balances with the old 
 
 ### Upgrading the image
 
-Releases are tags (`v0.2.0`) that publish `ghcr.io/betty1116/moneyrill:0.2.0` and `:0.2`. Nothing updates automatically and nothing announces a release: watch the GitHub releases and read the [CHANGELOG](../../CHANGELOG.md) first.
+Releases are tags (`v0.0.3`) that publish `ghcr.io/betty1116/moneyrill:0.0.3` and `:0.0`. Nothing updates automatically and nothing announces a release: watch the GitHub releases and read the [CHANGELOG](../../CHANGELOG.md) first.
 
 1. **Back up** ([above](#back-up-and-restore-everything-migration)); this setup has no rehearsal.
 2. **Set the new version and run `up -d`**; there is no need to run `down` first. Compose recreates only the app and worker (a few seconds of downtime while the app swaps), and the database container and volume are untouched, and migrations (additive, applied in order) run when the app starts:
    ```sh
-   MONEYRILL_VERSION=0.2.0 docker compose --env-file .env.production -f compose.image.production.yaml up -d
+   MONEYRILL_VERSION=0.0.3 docker compose --env-file .env.production -f compose.image.production.yaml up -d
    ```
    (the demo setup is the same without `--env-file`.)
 3. **Check** the version in the footer, the sign-in page or `GET /api/health`.
 
-To go back, set the previous `MONEYRILL_VERSION` and run `up -d` again: migrations stay backward compatible, so an older image runs on the newer schema. Keep the backup in case a release breaks that rule. Pin an exact tag such as `0.2.0`; `0.2` moves to each patch release, and there is no `latest`. Upgrade one release at a time when you can. A source checkout upgrades with `ship.sh` instead, which adds the backup, migration rehearsal and rollback.
+To go back, set the previous `MONEYRILL_VERSION` and run `up -d` again: migrations stay backward compatible, so an older image runs on the newer schema. Keep the backup in case a release breaks that rule. Pin an exact tag such as `0.0.3`; `0.0` moves to each patch release, and there is no `latest`. Upgrade one release at a time when you can. A source checkout upgrades with `ship.sh` instead, which adds the backup, migration rehearsal and rollback.
 
 ## Which version is running?
 

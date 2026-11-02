@@ -116,7 +116,7 @@ separate, deliberate operation.
 
 Each image carries the commit and build time (`COMMIT_SHA`, `BUILT_AT`, set by `deploy.sh` as build arguments; `-dirty` when the
 tree has uncommitted changes): shown in the footer and sign-in page and in `GET /api/health`; `ship.sh` checks each environment
-reports the commit it just deployed. Versions are tags (`v0.1.0`) and each tag publishes a container image; the changelog follows
+reports the commit it just deployed. Versions are tags (`v0.0.2`) and each tag publishes a container image; the changelog follows
 Keep a Changelog ([`CHANGELOG.md`](../../CHANGELOG.md)).
 
 ## Acceptance checks
